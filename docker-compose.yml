@@ -19,7 +19,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/cme
+      - DATABASE_URL=postgresql://postgres:%23Kbsc11071997@db:5432/cme_db
     depends_on:
       - db
 
@@ -27,12 +27,13 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: cme
+      POSTGRES_PASSWORD: "#Kbsc11071997"
+      POSTGRES_DB: cme_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
 
 volumes:
   pgdata:

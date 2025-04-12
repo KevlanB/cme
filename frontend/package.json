@@ -4,12 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"yarn dev:react\"",
-    "dev:react": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint -c .eslintrc.json ./src/**/**/*.{ts,tsx} --fix",
-    "preview": "vite preview"
-  },
+  "dev": "vite --host",
+  "build": "tsc && vite build",
+  "lint": "eslint -c .eslintrc.json ./src/**/**/*.{ts,tsx} --fix",
+  "preview": "vite preview"
+},
   "dependencies": {
     "@heroui/button": "2.2.13",
     "@heroui/code": "2.2.10",

@@ -58,7 +58,7 @@ export default function LoginPage() {
           <div className="max-w-md text-center justify-center w-full gap-2 flex flex-col ">
             <h1 className="font-bold text-zinc-200 text-4xl">Bem vindo</h1>
             <h1 className=" text-zinc-200 text-xl mb-10">
-              Entre com seu email e senha para acessar
+              Entre com seu usuário e senha para acessar
             </h1>
             <Input
               label="Usuário"

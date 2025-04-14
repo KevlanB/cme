@@ -100,7 +100,7 @@ export default function StepsPage() {
                 <Edit />
               </span>
             </Tooltip>
-            <Tooltip content="Excluir Produto">
+            <Tooltip content="Excluir">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <Trash2 />
               </span>

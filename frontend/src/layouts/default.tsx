@@ -68,6 +68,7 @@ export default function DefaultLayout({
             })
             .catch((error) => {
               console.error("Erro ao buscar os dados:", error);
+              authService.logout();
             });
         } else {
           console.error("Token não encontrado");

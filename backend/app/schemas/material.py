@@ -14,7 +14,7 @@ class MaterialCreate(MaterialBase):
 
 class MaterialUpdate(BaseModel):
     name: Optional[str] = None
-    step: Optional[int] = None
+    step_id: Optional[int] = None
     type: Optional[str] = None
     expiration_date: Optional[date] = None
     
@@ -25,5 +25,15 @@ class Material(MaterialBase):
     updated_at: Optional[datetime] = None
     step: Step
 
+    class Config:
+        from_attributes = True
+        
+class MaterialResponse(BaseModel):
+    id: int
+    name: str
+    type: str
+    serial: str
+    expiration_date: Optional[date]
+    
     class Config:
         from_attributes = True

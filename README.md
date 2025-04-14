@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Este sistema tem como objetivo ajudar no controle dos materiais hospitalares, facilitando o processo de esterilização dos equipamentos e garantindo que as etapas que um material deve percorrer para ser utilizado sejam seguidas corretamente.
+Este sistema tem como objetivo ajudar no controle dos materiais hospitalares, facilitando o processo de esterilização dos equipamentos e garantindo as etapas que um material deve percorrer para ser utilizado sejam seguidas corretamente.
 
 
 ## Funcionalidades

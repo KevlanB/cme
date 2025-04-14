@@ -63,8 +63,6 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       role_id: Number(fieldType),
     };
 
-    console.log(data);
-
     try {
       await axios.post(`${API_URL}/users`, data);
       onClose();

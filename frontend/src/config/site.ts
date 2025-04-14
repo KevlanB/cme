@@ -1,7 +1,7 @@
 import {
   Contact,
   House,
-  LayoutGrid,
+  Milestone,
   ScanSearch,
   Scissors,
   Users,
@@ -31,7 +31,7 @@ export const siteConfig = {
     {
       label: "Etapas",
       href: "/steps",
-      icon: LayoutGrid,
+      icon: Milestone,
     },
     {
       label: "Funções",
@@ -94,7 +94,7 @@ export const siteConfig = {
     {
       label: "Etapas",
       href: "/steps",
-      icon: LayoutGrid,
+      icon: Milestone,
     },
     {
       label: "Funções",

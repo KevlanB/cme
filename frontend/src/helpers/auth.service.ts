@@ -38,7 +38,6 @@ class AuthService {
       cb();
     } catch (err) {
       console.error(err);
-      console.log("Erro de autenticação");
     }
   }
 

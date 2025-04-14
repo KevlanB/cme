@@ -45,7 +45,6 @@ export default function UsersPage() {
     try {
       const response = await axios.get(`${API_URL}/users`);
 
-      console.log(response.data);
       setProducts(response.data);
       setLoading(false);
     } catch {
@@ -94,7 +93,7 @@ export default function UsersPage() {
                 <Edit />
               </span>
             </Tooltip>
-            <Tooltip content="Excluir Produto">
+            <Tooltip content="Excluir">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <Trash2 />
               </span>

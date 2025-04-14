@@ -11,7 +11,7 @@ import {
   useDisclosure,
   Input,
 } from "@heroui/react";
-import { Edit, Eye, PlusCircle, Search, Trash2 } from "lucide-react";
+import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
 import { formatDateTimeBR } from "@/utils/dateHours";
@@ -23,9 +23,8 @@ export const columns = [
   { name: "NOME", uid: "name" },
   { name: "SERIAL", uid: "serial" },
   { name: "VALIDADE", uid: "expiration_date" },
-  { name: "ETAPA", uid: "step" },
-  { name: "DATA", uid: "created_at" },
-  { name: "ATUALIZADO", uid: "updated_at" },
+  { name: "DATA DE CRIAÇÃO", uid: "created_at" },
+  { name: "ULT. ATUALIZAÇÃO", uid: "updated_at" },
   { name: "AÇÕES", uid: "actions" },
 ];
 
@@ -34,12 +33,14 @@ export default function MaterialsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentMaterial, setCurrentMaterial] = useState([]);
 
   const {
     isOpen: isOpenNewProduct,
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
   } = useDisclosure();
+
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
 
@@ -83,18 +84,13 @@ export default function MaterialsPage() {
       case "actions":
         return (
           <div className="relative flex items-center gap-2 justify-center">
-            <Tooltip content="Detalhes">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Eye />
-              </span>
-            </Tooltip>
             <Tooltip content="Editar">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <span className="text-lg text-default-600 cursor-pointer active:opacity-50">
                 <Edit />
               </span>
             </Tooltip>
-            <Tooltip content="Excluir Produto">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+            <Tooltip content="Excluir">
+              <span className="text-lg text-default-600 cursor-pointer active:opacity-50">
                 <Trash2 />
               </span>
             </Tooltip>

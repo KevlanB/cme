@@ -35,8 +35,10 @@ def delete_material(db: Session, material_id: int):
 
 def update_material(db: Session, material_id: int, material_update: MaterialUpdate):
     material = db.query(Material).filter(Material.id == material_id).first()
+    
+    print(material)
     if not material:
-        return None  # ou lançar um HTTPException
+        return None
 
     update_data = material_update.dict(exclude_unset=True)  # só atualiza o que foi enviado
     for key, value in update_data.items():

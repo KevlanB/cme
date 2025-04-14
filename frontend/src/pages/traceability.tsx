@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import type { RangeValue } from "@react-types/shared";
+
+import { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -6,142 +8,193 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Chip,
   Tooltip,
   Button,
   useDisclosure,
   Input,
+  RangeCalendar,
 } from "@heroui/react";
-import { Edit, Eye, PlusCircle, Search, Trash2 } from "lucide-react";
+import { Calendar, Eye, Search } from "lucide-react";
 import axios from "axios";
+import { DateValue } from "@react-types/calendar";
 
 import DefaultLayout from "@/layouts/default";
 import ModalNewProduct from "@/components/ModalNewMaterial";
+import { formatDate, formatDateComplete } from "@/utils/date";
 
 export const columns = [
-  { name: "DESCRIÇÃO", uid: "description" },
-  { name: "CÓDIGO", uid: "code" },
-  { name: "ESTOQUE", uid: "stock" },
-  { name: "PREÇO", uid: "price" },
-  { name: "STATUS", uid: "isActive" },
+  { name: "NOME", uid: "material_name" },
+  { name: "SERIAL", uid: "material_serial" },
+  { name: "VALIDADE", uid: "material_expiration" },
+  { name: "TIPO", uid: "material_type" },
+  { name: "ETAPA ANTERIOR", uid: "from_step" },
+  { name: "NOVA ETAPA", uid: "to_step" },
+  { name: "DATA E HORA DO REGISTRO", uid: "date_register" },
   { name: "AÇÕES", uid: "actions" },
 ];
 
 export default function TraceabilityPage() {
-  // Estado para armazenar os produtos
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentMaterial, setCurrentMaterial] = useState([]);
+  const [openCalendar, setOpenCalendar] = useState(false);
+  const [valueDate, setValueDate] = useState<RangeValue<DateValue> | null>(
+    null,
+  );
+
+  const [searchField, setSearchField] = useState("");
+
+  const [dataList, setDataList] = useState([]);
 
   const {
     isOpen: isOpenNewProduct,
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
   } = useDisclosure();
+
+  const {
+    isOpen: isOpenDrawer,
+    onOpen: onOpenDrawer,
+    onClose: onCloseDrawer,
+  } = useDisclosure();
+
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
 
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/products`);
-
-      setProducts(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError("Erro ao carregar os produtos.");
-      setLoading(false);
-    }
+  const handleDetails = (data: []) => {
+    setCurrentMaterial(data);
+    onOpenDrawer();
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const statusColorMap: any = {
-    true: "success",
-    false: "danger",
-  };
-
-  // Função para renderizar as células
   const renderCell = (product: any, columnKey: any) => {
-    const cellValue = product[columnKey];
-
     switch (columnKey) {
-      case "description":
-        return <div>{cellValue}</div>;
-      case "code":
-        return <div>{cellValue}</div>;
-      case "price":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize">
-              {typeof cellValue === "number" ? cellValue.toFixed(2) : cellValue}
-            </p>
-          </div>
-        );
-      case "isActive":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[cellValue]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue ? "Ativo" : "Inativo"}
-          </Chip>
-        );
+      case "material_name":
+        return product.material.name;
+
+      case "material_serial":
+        return product.material.serial;
+
+      case "material_expiration":
+        return product.material.expiration_date
+          ? formatDate(product.material.expiration_date)
+          : "-";
+
+      case "material_type":
+        return product.material.type;
+
+      case "from_step":
+        return product.from_step?.name ?? "-";
+
+      case "to_step":
+        return product.to_step?.name ?? "-";
+
+      case "date_register":
+        return formatDateComplete(product.changed_at);
+
       case "actions":
         return (
           <div className="relative flex items-center gap-2 justify-center">
             <Tooltip content="Detalhes">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Eye />
-              </span>
-            </Tooltip>
-            <Tooltip content="Editar">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Edit />
-              </span>
-            </Tooltip>
-            <Tooltip content="Excluir Produto">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Trash2 />
+              <span className="text-lg text-default-600 cursor-pointer active:opacity-50">
+                <Eye onClick={() => handleDetails(product)} />
               </span>
             </Tooltip>
           </div>
         );
+
       default:
-        return cellValue;
+        return product[columnKey];
     }
   };
 
-  const handleNewProduct = () => {
-    onOpenNewProduct();
+  const handleSearchLogs = async () => {
+    const startDate = `${valueDate?.start.year}-${String(valueDate?.start.month).padStart(2, "0")}-${String(valueDate?.start.day).padStart(2, "0")}`;
+    const endDate = `${valueDate?.end.year}-${String(valueDate?.end.month).padStart(2, "0")}-${String(valueDate?.end.day).padStart(2, "0")}`;
+
+    if (searchField.length > 0) {
+      await axios
+        .get(`${API_URL}/materials/logs/by-serial/${searchField}`, {
+          params: {
+            start_date: startDate,
+            end_date: endDate,
+          },
+        })
+        .then((response) => {
+          setDataList(response.data);
+          setOpenCalendar(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setOpenCalendar(false);
+        });
+    } else {
+      await axios
+        .get(`${API_URL}/materials/logs/all`, {
+          params: {
+            start_date: startDate,
+            end_date: endDate,
+          },
+        })
+        .then((response) => {
+          setDataList(response.data);
+          setOpenCalendar(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setOpenCalendar(false);
+        });
+    }
   };
 
   const handleCloseModal = () => {
     onCloseNewProduct();
-    fetchProducts();
   };
 
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center justify-start py-8 md:py-0 w-[100vw] h-[80vh] px-2">
-        <div className="flex flex-col w-full gap-2 mt-4">
-          <div className="flex justify-end">
+        <div className="flex flex-col w-full gap-2 mt-4 px-4">
+          <div className="flex justify-end gap-2">
             <Input
-              className="flex flex-row items-center justify-center w-60"
-              endContent={<Search size={18} />}
-              placeholder="Buscar produto"
+              className="w-60"
+              placeholder="Serial"
               size="md"
               type="text"
+              onChange={(e) => setSearchField(e.target.value)}
             />
+            <div>
+              <Input
+                disabled
+                className="w-60"
+                endContent={
+                  <Button
+                    isIconOnly
+                    className="bg-transparent"
+                    onPress={() => setOpenCalendar(!openCalendar)}
+                  >
+                    <Calendar className="text-default-500" />
+                  </Button>
+                }
+                placeholder="Data"
+                size="md"
+                type="text"
+              />
+              {openCalendar && (
+                <RangeCalendar
+                  aria-label="Date (No Selection)"
+                  className="fixed mt-2 z-10"
+                  value={valueDate}
+                  onChange={setValueDate}
+                />
+              )}
+            </div>
+
             <Button
               color="primary"
-              startContent={<PlusCircle size={18} />}
-              onPress={handleNewProduct}
+              startContent={<Search size={18} />}
+              onPress={handleSearchLogs}
             >
-              Novo
+              Buscar
             </Button>
           </div>
 
@@ -156,7 +209,7 @@ export default function TraceabilityPage() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={products}>
+            <TableBody items={dataList}>
               {(item: any) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (

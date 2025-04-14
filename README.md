@@ -51,6 +51,12 @@ Este sistema tem como objetivo ajudar no controle dos materiais hospitalares, fa
 
 ### Acesso ao sistema
 
+- Adicionei um init.db para o docker inserir alguns dados iniciais:
+
+1. Etapas (4 postos, podendo acrescentar mais)
+2. Usuário Admin | senha: Admin
+3. Funções (Administrativo, Técnico, Enfermagem)
+
 ## Variáveis de Ambiente
 
 ### Back-end

@@ -16,3 +16,6 @@ class Material(Base):
     
     step_id = Column(Integer, ForeignKey("steps.id"))
     step = relationship("Step", back_populates="materials")
+    
+    flow_id = Column(Integer, ForeignKey("flows.id"))
+    flow = relationship("Flow", back_populates="materials")

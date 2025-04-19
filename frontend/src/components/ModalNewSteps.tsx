@@ -41,7 +41,7 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   return (
     <Modal backdrop="blur" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">Novo Setor</ModalHeader>
+        <ModalHeader className="flex flex-col gap-1">Nova Etapa</ModalHeader>
         <ModalBody>
           <Input
             label="Nome"

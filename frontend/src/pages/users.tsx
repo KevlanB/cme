@@ -17,6 +17,7 @@ import axios from "axios";
 
 import DefaultLayout from "@/layouts/default";
 import ModalNewUser from "@/components/ModalNewUser";
+import ModalEditUser from "@/components/ModalEditUser";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -27,16 +28,31 @@ export const columns = [
   { name: "AÇÕES", uid: "actions" },
 ];
 
+type DataUser = {
+  id: number;
+  name: string;
+  username: string;
+  role_id: number;
+  isActive: boolean;
+} | null;
+
 export default function UsersPage() {
   // Estado para armazenar os produtos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentDataUser, setCurrentDataUser] = useState<DataUser>(null);
 
   const {
     isOpen: isOpenNewProduct,
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenEditUser,
+    onOpen: onOpenEditUser,
+    onClose: onCloseEditUser,
   } = useDisclosure();
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
@@ -90,7 +106,7 @@ export default function UsersPage() {
             </Tooltip>
             <Tooltip content="Editar">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Edit />
+                <Edit onClick={() => handleEditProduct(product)} />
               </span>
             </Tooltip>
             <Tooltip content="Excluir">
@@ -111,7 +127,14 @@ export default function UsersPage() {
 
   const handleCloseModal = () => {
     onCloseNewProduct();
+    onCloseEditUser();
     fetchProducts();
+  };
+
+  const handleEditProduct = (initialData: any) => {
+    console.log(initialData);
+    setCurrentDataUser(initialData);
+    onOpenEditUser();
   };
 
   return (
@@ -159,6 +182,11 @@ export default function UsersPage() {
         </div>
 
         <ModalNewUser isOpen={isOpenNewProduct} onClose={handleCloseModal} />
+        <ModalEditUser
+          initialData={currentDataUser}
+          isOpen={isOpenEditUser}
+          onClose={handleCloseModal}
+        />
       </section>
     </DefaultLayout>
   );

@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Divider,
+  addToast,
 } from "@heroui/react";
 import { Menu, Moon, Power, Sun } from "lucide-react";
 import { link as linkStyles } from "@heroui/theme";
@@ -69,6 +70,11 @@ export default function DefaultLayout({
             .catch((error) => {
               console.error("Erro ao buscar os dados:", error);
               authService.logout();
+              addToast({
+                title: "Sessão expirada",
+                color: "danger",
+                variant: "flat",
+              });
             });
         } else {
           console.error("Token não encontrado");

@@ -10,13 +10,21 @@ import {
   Select,
   SelectItem,
   addToast,
+  Switch,
 } from "@heroui/react";
 import axios from "axios";
 import { Eye, EyeClosed } from "lucide-react";
 
-interface ModalProps {
+interface ModalEditProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData: {
+    id: number;
+    name: string;
+    username: string;
+    role_id: number;
+    isActive: boolean;
+  } | null;
 }
 
 type Role = {
@@ -24,52 +32,61 @@ type Role = {
   name: string;
 };
 
-const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+const ModalEdit: React.FC<ModalEditProps> = ({
+  isOpen,
+  onClose,
+  initialData,
+}) => {
   const [fieldName, setFieldName] = useState("");
   const [fieldUserName, setFieldUserName] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [fieldPassword, setFieldPassword] = useState("");
   const [roles, setRoles] = useState<Role[]>([]);
+  const [isActive, setIsActive] = useState(true);
   const [eyePasswd, setEyePasswd] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const clearFields = () => {
-    setFieldName("");
-    setFieldPassword("");
-    setFieldUserName("");
-    setFieldType("");
-  };
-
   useEffect(() => {
     const getRoles = async () => {
-      await axios
-        .get(`${API_URL}/roles`)
-        .then((response) => {
-          setRoles(response.data);
-        })
-        .catch((error) => {
-          console.error("Erro ao buscar os dados:", error);
-        });
+      try {
+        const response = await axios.get(`${API_URL}/roles`);
+
+        setRoles(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar os dados:", error);
+      }
     };
 
     getRoles();
   }, []);
 
+  useEffect(() => {
+    if (initialData) {
+      setFieldName(initialData.name);
+      setFieldUserName(initialData.username);
+      setFieldType(String(initialData.role_id));
+      setFieldPassword(""); // senha não vem por segurança, só se editar.
+      setIsActive(initialData.isActive);
+    }
+  }, [initialData]);
+
   const handleSave = async () => {
+    if (!initialData) return;
+
     const data = {
       name: fieldName,
       username: fieldUserName,
-      password: fieldPassword,
+      password: fieldPassword || undefined, // só envia se for alterada
       role_id: Number(fieldType),
+      active: isActive,
     };
 
     try {
-      await axios.post(`${API_URL}/users`, data);
+      await axios.put(`${API_URL}/users/${initialData.id}`, data);
       onClose();
-      clearFields();
       addToast({
-        title: `Usuário ${data.username} foi cadastrado!`,
+        title: `Usuário ${data.username} foi atualizado!`,
         color: "success",
         variant: "flat",
       });
@@ -81,8 +98,13 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   return (
     <Modal backdrop="blur" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">Novo Usuário</ModalHeader>
+        <ModalHeader className="flex flex-col gap-1">
+          Editar Usuário
+        </ModalHeader>
         <ModalBody>
+          <Switch isSelected={isActive} onValueChange={setIsActive}>
+            Ativo
+          </Switch>
           <Input
             label="Nome"
             type="text"
@@ -122,8 +144,9 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 />
               )
             }
-            label="Senha"
+            label="Senha (deixe em branco para não alterar)"
             type={eyePasswd ? "text" : "password"}
+            value={fieldPassword}
             onChange={(e) => setFieldPassword(e.target.value)}
           />
         </ModalBody>
@@ -140,4 +163,4 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default ModalNew;
+export default ModalEdit;

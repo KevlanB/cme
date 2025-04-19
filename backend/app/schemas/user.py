@@ -13,7 +13,11 @@ class UserCreate(UserBase):
    pass
 
 class UserUpdate(UserBase):
-    pass
+    name: str
+    username: str
+    password: str
+    role_id: int
+    active: Optional[bool] = True
 
 class User(UserBase):
     id: int

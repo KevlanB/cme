@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -8,6 +8,8 @@ import {
   Button,
   Input,
   DateInput,
+  Select,
+  SelectItem,
 } from "@heroui/react";
 import axios from "axios";
 import { getLocalTimeZone, today } from "@internationalized/date";
@@ -21,8 +23,25 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [fieldName, setFieldName] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [fieldExpiration, setFieldExpiration] = useState("");
+  const [flows, setFlows] = useState([]);
+  const [fieldFlow, setFieldFlow] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const getRoles = async () => {
+      await axios
+        .get(`${API_URL}/flows`)
+        .then((response) => {
+          setFlows(response.data);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar os dados:", error);
+        });
+    };
+
+    getRoles();
+  }, []);
 
   const clearFields = () => {
     setFieldName("");
@@ -34,6 +53,7 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       name: fieldName,
       type: fieldType,
       expiration_date: fieldExpiration,
+      flow_id: Number(fieldFlow),
     };
 
     try {
@@ -75,6 +95,19 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
               }
             }}
           />
+          <Select
+            label="Fluxo"
+            selectedKeys={new Set([fieldFlow])}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0];
+
+              setFieldFlow(String(selected));
+            }}
+          >
+            {flows.map((f) => (
+              <SelectItem key={String(f.id)}>{f.name}</SelectItem>
+            ))}
+          </Select>
         </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>

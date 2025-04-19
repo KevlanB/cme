@@ -5,6 +5,7 @@ import {
   ScanSearch,
   Scissors,
   Users,
+  Workflow,
 } from "lucide-react";
 
 export type SiteConfig = typeof siteConfig;
@@ -37,6 +38,11 @@ export const siteConfig = {
       label: "Funções",
       href: "/roles",
       icon: Contact,
+    },
+    {
+      label: "Fluxos",
+      href: "/flows",
+      icon: Workflow,
     },
     {
       label: "Rastreabilidade",

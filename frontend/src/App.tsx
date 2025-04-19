@@ -8,6 +8,7 @@ import UsersPage from "@/pages/users";
 import StepsPage from "@/pages/steps";
 import RolesPage from "@/pages/roles";
 import TraceabilityPage from "@/pages/traceability";
+import FlowsPage from "@/pages/flows";
 
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
           </PrivateRoute>
         }
         path="/traceability"
+      />
+      <Route
+        element={
+          <PrivateRoute>
+            <FlowsPage />
+          </PrivateRoute>
+        }
+        path="/flows"
       />
     </Routes>
   );

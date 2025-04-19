@@ -6,6 +6,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Chip,
   Tooltip,
   Button,
   useDisclosure,
@@ -14,21 +15,17 @@ import {
 import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
-import { formatDateTimeBR } from "@/utils/dateHours";
 import DefaultLayout from "@/layouts/default";
-import ModalNewProduct from "@/components/ModalNewMaterial";
+import ModalNewFlow from "@/components/ModalNewFlows";
 
 export const columns = [
   { name: "ID", uid: "id" },
   { name: "NOME", uid: "name" },
-  { name: "SERIAL", uid: "serial" },
-  { name: "VALIDADE", uid: "expiration_date" },
-  { name: "DATA DE CRIAÇÃO", uid: "created_at" },
-  { name: "FLUXO", uid: "flow" },
+  { name: "ETAPAS", uid: "steps" },
   { name: "AÇÕES", uid: "actions" },
 ];
 
-export default function MaterialsPage() {
+export default function FlowsPage() {
   // Estado para armazenar os produtos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,18 +36,17 @@ export default function MaterialsPage() {
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
   } = useDisclosure();
-
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${API_URL}/materials`);
+      const response = await axios.get(`${API_URL}/flows`);
 
       setProducts(response.data);
       setLoading(false);
     } catch (err) {
-      setError("Erro ao carregar os produtos.");
+      setError("Erro ao carregar as etapas.");
       setLoading(false);
     }
   };
@@ -59,40 +55,47 @@ export default function MaterialsPage() {
     fetchProducts();
   }, []);
 
-  function formatDate(dateStr: string): string {
-    const [year, month, day] = dateStr.split("-");
-
-    return `${day}/${month}/${year}`;
-  }
+  const statusColorMap: any = {
+    true: "success",
+    false: "danger",
+  };
 
   // Função para renderizar as células
   const renderCell = (product: any, columnKey: any) => {
     const cellValue = product[columnKey];
 
+    {
+      console.log(cellValue);
+    }
+
     switch (columnKey) {
-      case "expiration_date":
-        return cellValue !== null && <div>{formatDate(cellValue)}</div>;
-      case "step":
-        return <div>{cellValue.name}</div>;
-      case "created_at":
-        return <div>{formatDateTimeBR(cellValue)}</div>;
-
-      case "updated_at":
-        return <div>{formatDateTimeBR(cellValue)}</div>;
-
-      case "flow":
-        return <div>{cellValue.name}</div>;
+      case "steps":
+        return (
+          <>
+            {cellValue.map((e) => (
+              <Chip
+                key={e.id}
+                className="capitalize dark:text-white text-black"
+                color="primary"
+                size="sm"
+                variant="flat"
+              >
+                {e.name}
+              </Chip>
+            ))}
+          </>
+        );
 
       case "actions":
         return (
           <div className="relative flex items-center gap-2 justify-center">
             <Tooltip content="Editar">
-              <span className="text-lg text-default-600 cursor-pointer active:opacity-50">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <Edit />
               </span>
             </Tooltip>
             <Tooltip content="Excluir">
-              <span className="text-lg text-default-600 cursor-pointer active:opacity-50">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <Trash2 />
               </span>
             </Tooltip>
@@ -120,7 +123,7 @@ export default function MaterialsPage() {
             <Input
               className="flex flex-row items-center justify-center w-60"
               endContent={<Search size={18} />}
-              placeholder="Buscar produto"
+              placeholder="Buscar fluxo"
               size="md"
               type="text"
             />
@@ -133,7 +136,7 @@ export default function MaterialsPage() {
             </Button>
           </div>
 
-          <Table aria-label="Tabela de Produtos">
+          <Table aria-label="Tabela de Funções">
             <TableHeader columns={columns}>
               {(column) => (
                 <TableColumn
@@ -156,7 +159,7 @@ export default function MaterialsPage() {
           </Table>
         </div>
 
-        <ModalNewProduct isOpen={isOpenNewProduct} onClose={handleCloseModal} />
+        <ModalNewFlow isOpen={isOpenNewProduct} onClose={handleCloseModal} />
       </section>
     </DefaultLayout>
   );

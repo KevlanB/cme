@@ -16,7 +16,7 @@ import { Edit, Eye, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
 import DefaultLayout from "@/layouts/default";
-import ModalNewDepartment from "@/components/ModalNewRoles";
+import ModalNewRoles from "@/components/ModalNewRoles";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -165,10 +165,7 @@ export default function RolesPage() {
           </Table>
         </div>
 
-        <ModalNewDepartment
-          isOpen={isOpenNewProduct}
-          onClose={handleCloseModal}
-        />
+        <ModalNewRoles isOpen={isOpenNewProduct} onClose={handleCloseModal} />
       </section>
     </DefaultLayout>
   );

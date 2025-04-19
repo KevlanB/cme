@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.security import OAuth2PasswordBearer
-from app.routes import material, step, user, role, auth
+from app.routes import material, step, user, role, auth, flow
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -18,6 +18,7 @@ app.include_router(step.router)
 app.include_router(user.router)
 app.include_router(role.router)
 app.include_router(auth.router)
+app.include_router(flow.router)
 
 from app.models.material import Material
 

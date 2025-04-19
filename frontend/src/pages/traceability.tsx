@@ -157,7 +157,7 @@ export default function TraceabilityPage() {
           <div className="flex justify-end gap-2">
             <Input
               className="w-60"
-              placeholder="Serial"
+              placeholder="Buscar por Serial"
               size="md"
               type="text"
               onChange={(e) => setSearchField(e.target.value)}
@@ -175,7 +175,7 @@ export default function TraceabilityPage() {
                     <Calendar className="text-default-500" />
                   </Button>
                 }
-                placeholder="Data"
+                placeholder="Buscar por Data"
                 size="md"
                 type="text"
               />

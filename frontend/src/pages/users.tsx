@@ -157,7 +157,6 @@ export default function UsersPage() {
               Novo
             </Button>
           </div>
-
           <Table aria-label="Tabela de Produtos">
             <TableHeader columns={columns}>
               {(column) => (

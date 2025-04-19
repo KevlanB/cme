@@ -5,19 +5,18 @@ from typing import Optional
 class UserBase(BaseModel):
     name: str
     username: str
-    password: str
     role_id: int
     active: Optional[bool] = True
 
 class UserCreate(UserBase):
-   pass
+    password: str  # Obrigatório ao criar!
 
-class UserUpdate(UserBase):
+class UserUpdate(BaseModel):
     name: str
     username: str
-    password: str
+    password: Optional[str] = None  # Opcional no update
     role_id: int
-    active: Optional[bool] = True
+    active: bool
 
 class User(UserBase):
     id: int

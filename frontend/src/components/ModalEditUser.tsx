@@ -47,6 +47,8 @@ const ModalEdit: React.FC<ModalEditProps> = ({
 
   const API_URL = import.meta.env.VITE_API_URL;
 
+  console.log(initialData)
+
   useEffect(() => {
     const getRoles = async () => {
       try {
@@ -67,7 +69,7 @@ const ModalEdit: React.FC<ModalEditProps> = ({
       setFieldUserName(initialData.username);
       setFieldType(String(initialData.role_id));
       setFieldPassword(""); // senha não vem por segurança, só se editar.
-      setIsActive(initialData.isActive);
+      setIsActive(initialData.active);
     }
   }, [initialData]);
 
@@ -77,10 +79,12 @@ const ModalEdit: React.FC<ModalEditProps> = ({
     const data = {
       name: fieldName,
       username: fieldUserName,
-      password: fieldPassword || undefined, // só envia se for alterada
+      password: fieldPassword ? fieldPassword : undefined,  // só envia se for alterada
       role_id: Number(fieldType),
       active: isActive,
     };
+
+    console.log("DATA", data)
 
     try {
       await axios.put(`${API_URL}/users/${initialData.id}`, data);
@@ -103,7 +107,7 @@ const ModalEdit: React.FC<ModalEditProps> = ({
         </ModalHeader>
         <ModalBody>
           <Switch isSelected={isActive} onValueChange={setIsActive}>
-            Ativo
+            {isActive ? "Ativo" : "Inativo"}
           </Switch>
           <Input
             label="Nome"

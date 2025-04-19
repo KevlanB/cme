@@ -52,10 +52,11 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role_id INTEGER REFERENCES roles(id),
-    active BOOLEAN DEFAULT true
+    active BOOLEAN DEFAULT true,
+    is_deleted BOOLEAN DEFAULT false
 );
 
 -- Inserir o usuário admin na tabela 'users'
-INSERT INTO users (name, username, password, role_id, active) 
-VALUES ('admin', 'admin', '$2b$10$sT20cs23h9y5kRW9EGmmjerh1h7tMce7JZ1ehnFqjBPbDXBHeh5g.', 1, true)
+INSERT INTO users (name, username, password, role_id, active, is_deleted) 
+VALUES ('admin', 'admin', '$2b$10$sT20cs23h9y5kRW9EGmmjerh1h7tMce7JZ1ehnFqjBPbDXBHeh5g.', 1, true, false)
 ON CONFLICT (username) DO NOTHING;

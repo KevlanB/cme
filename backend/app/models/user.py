@@ -11,6 +11,7 @@ class User(Base):
     username = username = Column(String, unique=True, index=True)
     password = Column(String(128), nullable=False)
     active = Column(Boolean, default=True)
+    is_deleted = Column(Boolean, default=False)
     
     # relacionamento com Role
     role_id = Column(Integer, ForeignKey("roles.id"))

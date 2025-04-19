@@ -24,7 +24,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 @router.put("/{user_id}", response_model=schemas.user.User)
-def update_user(user_id: int, user: schemas.user.UserCreate, db: Session = Depends(get_db)):
+def update_user(user_id: int, user: schemas.user.UserUpdate, db: Session = Depends(get_db)):
     updated = crud_user.update_user(db, user_id, user)
     if not updated:
         raise HTTPException(status_code=404, detail="user não encontrado")

@@ -23,7 +23,7 @@ interface ModalEditProps {
     name: string;
     username: string;
     role_id: number;
-    isActive: boolean;
+    active: boolean;
   } | null;
 }
 
@@ -47,7 +47,7 @@ const ModalEdit: React.FC<ModalEditProps> = ({
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  console.log(initialData)
+  console.log(initialData);
 
   useEffect(() => {
     const getRoles = async () => {
@@ -79,12 +79,12 @@ const ModalEdit: React.FC<ModalEditProps> = ({
     const data = {
       name: fieldName,
       username: fieldUserName,
-      password: fieldPassword ? fieldPassword : undefined,  // só envia se for alterada
+      password: fieldPassword ? fieldPassword : undefined, // só envia se for alterada
       role_id: Number(fieldType),
       active: isActive,
     };
 
-    console.log("DATA", data)
+    console.log("DATA", data);
 
     try {
       await axios.put(`${API_URL}/users/${initialData.id}`, data);

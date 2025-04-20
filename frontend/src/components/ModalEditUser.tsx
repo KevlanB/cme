@@ -47,7 +47,7 @@ const ModalEdit: React.FC<ModalEditProps> = ({
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  console.log(initialData);
+  console.log("edit",initialData);
 
   useEffect(() => {
     const getRoles = async () => {

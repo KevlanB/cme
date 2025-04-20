@@ -61,7 +61,7 @@ const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       name: fieldName,
       username: fieldUserName,
       password: fieldPassword,
-      role_id: Number(fieldType),
+      role_id: Number(fieldType)
     };
 
     try {

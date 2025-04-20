@@ -18,6 +18,7 @@ import axios from "axios";
 import DefaultLayout from "@/layouts/default";
 import ModalNewUser from "@/components/ModalNewUser";
 import ModalEditUser from "@/components/ModalEditUser";
+import ModalDelete from "@/components/ModalDeleteUser";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -53,6 +54,12 @@ export default function UsersPage() {
     isOpen: isOpenEditUser,
     onOpen: onOpenEditUser,
     onClose: onCloseEditUser,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenDeleteUser,
+    onOpen: onOpenDeleteUser,
+    onClose: onCloseDeleteUser,
   } = useDisclosure();
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
@@ -99,19 +106,14 @@ export default function UsersPage() {
       case "actions":
         return (
           <div className="relative flex items-center gap-2 justify-center">
-            <Tooltip content="Detalhes">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Eye />
-              </span>
-            </Tooltip>
             <Tooltip content="Editar">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Edit onClick={() => handleEditProduct(product)} />
+                <Edit onClick={() => handleEditUser(product)} />
               </span>
             </Tooltip>
             <Tooltip content="Excluir">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Trash2 />
+                <Trash2 onClick={() => handleDeleteUser(product)}/>
               </span>
             </Tooltip>
           </div>
@@ -127,21 +129,26 @@ export default function UsersPage() {
 
   const handleCloseModal = () => {
     onCloseNewProduct();
+    onCloseDeleteUser();
     onCloseEditUser();
     fetchProducts();
   };
 
-  const handleEditProduct = (initialData: any) => {
-    console.log(initialData);
+  const handleEditUser = (initialData: any) => {
     setCurrentDataUser(initialData);
     onOpenEditUser();
+  };
+
+  const handleDeleteUser = (initialData: any) => {
+    setCurrentDataUser(initialData);
+    onOpenDeleteUser();
   };
 
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center justify-start py-8 md:py-0 w-[100vw] h-[80vh] px-2">
         <div className="flex flex-col w-full gap-2 mt-4">
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
             <Input
               className="flex flex-row items-center justify-center w-60"
               endContent={<Search size={18} />}
@@ -184,6 +191,11 @@ export default function UsersPage() {
         <ModalEditUser
           initialData={currentDataUser}
           isOpen={isOpenEditUser}
+          onClose={handleCloseModal}
+        />
+        <ModalDelete
+          initialData={currentDataUser}
+          isOpen={isOpenDeleteUser}
           onClose={handleCloseModal}
         />
       </section>

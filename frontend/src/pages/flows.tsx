@@ -119,7 +119,7 @@ export default function FlowsPage() {
     <DefaultLayout>
       <section className="flex flex-col items-center justify-start py-8 md:py-0 w-[100vw] h-[80vh] px-2">
         <div className="flex flex-col w-full gap-2 mt-4">
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
             <Input
               className="flex flex-row items-center justify-center w-60"
               endContent={<Search size={18} />}

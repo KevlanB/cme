@@ -235,16 +235,6 @@ export default function DefaultLayout({
                                 "font-bold": isActive,
                               })
                             }
-                            to="/fails"
-                          >
-                            Erros
-                          </NavLink>
-                          <NavLink
-                            className={({ isActive }) =>
-                              clsx(linkStyles({ color: "foreground" }), {
-                                "font-bold": isActive,
-                              })
-                            }
                             to="/traceability"
                           >
                             Rastreabilidade

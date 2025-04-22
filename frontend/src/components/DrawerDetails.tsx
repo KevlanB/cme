@@ -11,26 +11,67 @@ import {
   CardHeader,
   CardBody,
   Divider,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
 } from "@heroui/react";
 import { Milestone } from "lucide-react";
 
-interface ModalProps {
+import { formatDateComplete } from "@/utils/date";
+
+interface ModalEditProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData: {
+    id: number;
+    name: string;
+    steps: {
+      id: number;
+      name: string;
+    }[];
+  } | null;
 }
 
-const DrawerDetails: React.FC<ModalProps> = ({ isOpen, onClose, material }) => {
+export const columns = [
+  { name: "ID", uid: "id" },
+  { name: "DESC", uid: "description" },
+  { name: "ETAPA", uid: "step" },
+  { name: "DATA E HORA DA FALHA", uid: "created_at" },
+];
+
+const DrawerDetails: React.FC<ModalEditProps> = ({
+  isOpen,
+  onClose,
+  initialData,
+}) => {
   const [logs, setLogs] = useState([]);
   const [counts, setCounts] = useState([]);
+  const [fieldName, setFieldName] = useState("");
+  const [fieldSerial, setFieldSerial] = useState("");
+  const [fieldId, setFieldId] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [fails, setFails] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
+    if (initialData) {
+      setFieldId(initialData.id);
+      setFieldName(initialData.material?.name);
+      setFieldSerial(initialData.material?.serial);
+    }
+  }, [initialData]);
+
+  useEffect(() => {
+    if (!initialData?.id) return;
+
     const getDetails = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/materials/${material.id}/logs`,
+          `${API_URL}/materials/logs/${initialData.id}`,
         );
 
         setLogs(response.data.logs);
@@ -41,8 +82,34 @@ const DrawerDetails: React.FC<ModalProps> = ({ isOpen, onClose, material }) => {
       }
     };
 
+    const getFails = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/materials/fails/${initialData.id}`,
+        );
+
+        console.log("response", response.data);
+        setFails(response.data);
+      } catch (err) {
+        console.log("err", err);
+      }
+    };
+
     getDetails();
-  }, [isOpen, material]);
+    getFails();
+  }, [initialData]);
+
+  const renderCell = (product: any, columnKey: any) => {
+    console.log("product", product);
+    switch (columnKey) {
+      case "step":
+        return <span className="text-default-600">{product.step.name}</span>;
+      case "created_at":
+        return formatDateComplete(product.created_at);
+      default:
+        return product[columnKey];
+    }
+  };
 
   return (
     <Drawer
@@ -55,7 +122,7 @@ const DrawerDetails: React.FC<ModalProps> = ({ isOpen, onClose, material }) => {
         {(onClose) => (
           <>
             <DrawerHeader className="flex flex-col gap-1">
-              {material.serial} - {material.name}
+              {fieldSerial} - {fieldName}
             </DrawerHeader>
             <DrawerBody className="h-[60px]">
               <div className="flex gap-2">
@@ -72,11 +139,27 @@ const DrawerDetails: React.FC<ModalProps> = ({ isOpen, onClose, material }) => {
                 ))}
               </div>
 
-              {logs.map((l) => (
-                <div key={l.id}>
-                  <h1>{l.from_step.name}</h1>
-                </div>
-              ))}
+              <Table aria-label="Tabela de Produtos">
+                <TableHeader columns={columns}>
+                  {(column) => (
+                    <TableColumn
+                      key={column.uid}
+                      align={column.uid === "actions" ? "center" : "start"}
+                    >
+                      {column.name}
+                    </TableColumn>
+                  )}
+                </TableHeader>
+                <TableBody items={fails}>
+                  {(item: any) => (
+                    <TableRow key={item.id}>
+                      {(columnKey) => (
+                        <TableCell>{renderCell(item, columnKey)}</TableCell>
+                      )}
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </DrawerBody>
             <DrawerFooter>
               <Button color="success" variant="light" onPress={onClose}>

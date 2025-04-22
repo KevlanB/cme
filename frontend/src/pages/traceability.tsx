@@ -21,6 +21,7 @@ import { DateValue } from "@react-types/calendar";
 import DefaultLayout from "@/layouts/default";
 import ModalNewProduct from "@/components/Modals/Create/ModalNewMaterial";
 import { formatDate, formatDateComplete } from "@/utils/date";
+import DrawerDetails from "@/components/DrawerDetails";
 
 export const columns = [
   { name: "NOME", uid: "material_name" },
@@ -218,6 +219,11 @@ export default function TraceabilityPage() {
         </div>
 
         <ModalNewProduct isOpen={isOpenNewProduct} onClose={handleCloseModal} />
+        <DrawerDetails
+          initialData={currentMaterial}
+          isOpen={isOpenDrawer}
+          onClose={onCloseDrawer}
+        />
       </section>
     </DefaultLayout>
   );

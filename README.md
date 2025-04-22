@@ -38,12 +38,14 @@ Este sistema tem como objetivo ajudar no controle dos materiais hospitalares, fa
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/usuario/projeto.git
+   git clone https://github.com/KevlanB/cme.git
 
 2. Crie os arquivos .env tanto no diretório do Back-end quanto no diretório do Front-end com as variáveis necessárias:
 
 - No Back-end: DATABASE_URL
 - No Front-end: VITE_API_URL
+
+atualização: adicionei env.example para facilitar. Apenas renomeie para .env e preencha com as informações tanto do banco na raiz do projeto quanto os arquivos. env nas pastas frontend/ e backend/
 
 3. Execute o comando abaixo para rodar o projeto:
    ```bash

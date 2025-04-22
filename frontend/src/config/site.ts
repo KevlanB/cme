@@ -2,7 +2,6 @@ import {
   Contact,
   House,
   Milestone,
-  ScanSearch,
   Scissors,
   Users,
   Workflow,
@@ -44,11 +43,6 @@ export const siteConfig = {
       href: "/flows",
       icon: Workflow,
     },
-    {
-      label: "Rastreabilidade",
-      href: "/traceability",
-      icon: ScanSearch,
-    },
   ],
   tecItems: [
     {
@@ -73,12 +67,6 @@ export const siteConfig = {
       label: "Materiais",
       href: "/materials",
       icon: Scissors,
-    },
-
-    {
-      label: "Rastreabilidade",
-      href: "/traceability",
-      icon: ScanSearch,
     },
   ],
   navMenuItems: [
@@ -107,11 +95,7 @@ export const siteConfig = {
       href: "/roles",
       icon: Contact,
     },
-    {
-      label: "Rastreabilidade",
-      href: "/traceability",
-      icon: ScanSearch,
-    },
+
     {
       label: "Logout",
       href: "/logout",

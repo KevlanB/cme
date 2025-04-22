@@ -10,4 +10,8 @@ RUN apt-get update && apt-get install -y curl && \
     pip install --upgrade pip && \
     pip install -r requirements.txt
 
-    CMD ["wait-for-it.sh", "db:5432", "--", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+RUN pip install pytest
+
+ENV PYTHONPATH=/app
+
+CMD ["wait-for-it.sh", "db:5432", "--", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

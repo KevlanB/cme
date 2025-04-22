@@ -17,3 +17,4 @@ class Step(Base):
         secondary="flow_steps",
         back_populates="steps"
     )
+    material_fails = relationship("MaterialFail", back_populates="step")

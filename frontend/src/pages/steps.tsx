@@ -12,11 +12,13 @@ import {
   useDisclosure,
   Input,
 } from "@heroui/react";
-import { Edit, Eye, PlusCircle, Search, Trash2 } from "lucide-react";
+import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
 import DefaultLayout from "@/layouts/default";
-import ModalNewDepartment from "@/components/ModalNewSteps";
+import ModalNewDepartment from "@/components/Modals/Create/ModalNewSteps";
+import ModalEditSteps from "@/components/Modals/Edit/ModalEditSteps";
+import ModalDelete from "@/components/Modals/Delete/ModalDeleteSteps";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -24,17 +26,43 @@ export const columns = [
   { name: "AÇÕES", uid: "actions" },
 ];
 
+type DataMaterial = {
+  id: number;
+  name: string;
+  type: string;
+} | null;
+
 export default function StepsPage() {
   // Estado para armazenar os produtos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentDataMaterial, setCurrentDataMaterial] =
+    useState<DataMaterial>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filtered = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const {
     isOpen: isOpenNewProduct,
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
   } = useDisclosure();
+
+  const {
+    isOpen: isOpenEditSteps,
+    onOpen: onOpenEditSteps,
+    onClose: onCloseEditSteps,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenDeleteSteps,
+    onOpen: onOpenDeleteSteps,
+    onClose: onCloseDeleteSteps,
+  } = useDisclosure();
+
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
 
@@ -90,19 +118,14 @@ export default function StepsPage() {
       case "actions":
         return (
           <div className="relative flex items-center gap-2 justify-center">
-            <Tooltip content="Detalhes">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Eye />
-              </span>
-            </Tooltip>
             <Tooltip content="Editar">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Edit />
+                <Edit onClick={() => handleEditSteps(product)} />
               </span>
             </Tooltip>
             <Tooltip content="Excluir">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Trash2 />
+                <Trash2 onClick={() => handleDeleteSteps(product)} />
               </span>
             </Tooltip>
           </div>
@@ -118,7 +141,19 @@ export default function StepsPage() {
 
   const handleCloseModal = () => {
     onCloseNewProduct();
+    onCloseEditSteps();
+    onCloseDeleteSteps();
     fetchProducts();
+  };
+
+  const handleEditSteps = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenEditSteps();
+  };
+
+  const handleDeleteSteps = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenDeleteSteps();
   };
 
   return (
@@ -129,9 +164,11 @@ export default function StepsPage() {
             <Input
               className="flex flex-row items-center justify-center w-60"
               endContent={<Search size={18} />}
-              placeholder="Buscar produto"
+              placeholder="Buscar etapa"
               size="md"
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Button
               color="primary"
@@ -153,7 +190,7 @@ export default function StepsPage() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={products}>
+            <TableBody items={filtered}>
               {(item: any) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
@@ -167,6 +204,16 @@ export default function StepsPage() {
 
         <ModalNewDepartment
           isOpen={isOpenNewProduct}
+          onClose={handleCloseModal}
+        />
+        <ModalEditSteps
+          initialData={currentDataMaterial}
+          isOpen={isOpenEditSteps}
+          onClose={handleCloseModal}
+        />
+        <ModalDelete
+          initialData={currentDataMaterial}
+          isOpen={isOpenDeleteSteps}
           onClose={handleCloseModal}
         />
       </section>

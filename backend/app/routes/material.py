@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app import schemas
 from app.crud import material as crud_material
+from app.crud import material_fail as crud_material_fail
 from app.database.database import get_db
 from app.models.material_log import MaterialLog
 from app.schemas.material_log import MaterialLogResponse, StepCountResponse, MaterialLogsWithCountsResponse
@@ -11,6 +12,7 @@ from sqlalchemy import func
 from datetime import date, datetime, time
 from typing import List
 from fastapi import APIRouter, Depends, Query
+from app.schemas.material_fail import MaterialFailResponse
 
 router = APIRouter(prefix="/materials", tags=["Materials"])
 
@@ -138,6 +140,16 @@ def get_material_logs(material_id: int, db: Session = Depends(get_db)):
         .filter(MaterialLog.material_id == material_id) \
         .all()
 
+    # Buscar falhas associadas ao material
+    material_fails = crud_material_fail.get_material_fails(db=db, material_id=material_id)
+
+    # Converter falhas para o formato Pydantic (MaterialFailResponse)
+    material_fails_response = [MaterialFailResponse.from_orm(fail) for fail in material_fails]
+
+    # Verificar se falhas foram encontradas
+    if not material_fails_response:
+        raise HTTPException(status_code=404, detail="Falhas não encontradas para este material")
+
     # Contar passagens por step com nome
     step_counts_query = db.query(
         MaterialLog.to_step_id.label("step_id"),
@@ -161,6 +173,25 @@ def get_material_logs(material_id: int, db: Session = Depends(get_db)):
 
     return {
         "logs": logs,
+        "fails": material_fails_response,
         "step_counts": step_counts
     }
+
+
+
+@router.post("/fails/{material_id}", response_model=schemas.material_fail.MaterialFailResponse)
+def create_material_fail(material_id: int, step_id: int, description: str, db: Session = Depends(get_db)):
+    # Criar falha
+    material_fail = crud_material_fail.create_material_fail(db=db, material_id=material_id, step_id=step_id, description=description)
+    if not material_fail:
+        raise HTTPException(status_code=404, detail="Material não encontrado")
+    return material_fail
+
+@router.get("/fails/{material_id}", response_model=list[schemas.material_fail.MaterialFailResponse])
+def get_material_fails(material_id: int, db: Session = Depends(get_db)):
+    # Retornar falhas de um material
+    material_fails = crud_material_fail.get_material_fails(db=db, material_id=material_id)
+    if not material_fails:
+        raise HTTPException(status_code=404, detail="Falhas não encontradas para este material")
+    return material_fails
 

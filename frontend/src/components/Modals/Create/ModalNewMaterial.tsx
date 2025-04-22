@@ -18,12 +18,16 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+type flows = {
+  id: string;
+  name: string;
+};
 
 const ModalNew: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [fieldName, setFieldName] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [fieldExpiration, setFieldExpiration] = useState("");
-  const [flows, setFlows] = useState([]);
+  const [flows, setFlows] = useState<flows[]>([]);
   const [fieldFlow, setFieldFlow] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;

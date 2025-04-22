@@ -19,3 +19,5 @@ class Material(Base):
     
     flow_id = Column(Integer, ForeignKey("flows.id"))
     flow = relationship("Flow", back_populates="materials")
+    
+    fails = relationship("MaterialFail", back_populates="material", cascade="all, delete-orphan")

@@ -15,7 +15,7 @@ import {
   Divider,
   addToast,
 } from "@heroui/react";
-import { Menu, Moon, Power, Sun } from "lucide-react";
+import { ChevronDown, Menu, Moon, Power, ScanSearch, Sun } from "lucide-react";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 import { useTheme } from "@heroui/use-theme";
@@ -43,6 +43,7 @@ export default function DefaultLayout({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { theme, setTheme } = useTheme();
   const [user, setUser] = useState<UserType | null>(null);
+  const [isLogsOpen, setIsLogsOpen] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -141,11 +142,13 @@ export default function DefaultLayout({
                       return (
                         <div
                           key={item.href}
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 "
                         >
                           <NavLink
-                            className={({}) =>
-                              clsx(linkStyles({ color: "foreground" }))
+                            className={({ isActive }) =>
+                              clsx(linkStyles({ color: "foreground" }), {
+                                "font-bold": isActive,
+                              })
                             }
                             to={item.href}
                           >
@@ -202,7 +205,58 @@ export default function DefaultLayout({
                           </div>
                         );
                       })}
-                <div className="flex flex-row items-start py-0 my-[-10px]">
+                {user?.role.name === "Administrativo" && (
+                  <>
+                    <Divider className="my-2" />
+                    <div className="flex flex-col">
+                      <button
+                        className="flex items-center justify-between w-full gap-2 py-1 text-left"
+                        onClick={() => setIsLogsOpen(!isLogsOpen)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <ScanSearch size={18} />
+                          Logs
+                        </div>
+                        <ChevronDown
+                          className={
+                            isLogsOpen
+                              ? "rotate-180 transition-transform"
+                              : "transition-transform"
+                          }
+                          size={16}
+                        />
+                      </button>
+
+                      {isLogsOpen && (
+                        <div className="ml-6 mt-1 flex flex-col gap-1">
+                          <NavLink
+                            className={({ isActive }) =>
+                              clsx(linkStyles({ color: "foreground" }), {
+                                "font-bold": isActive,
+                              })
+                            }
+                            to="/fails"
+                          >
+                            Erros
+                          </NavLink>
+                          <NavLink
+                            className={({ isActive }) =>
+                              clsx(linkStyles({ color: "foreground" }), {
+                                "font-bold": isActive,
+                              })
+                            }
+                            to="/traceability"
+                          >
+                            Rastreabilidade
+                          </NavLink>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </DrawerBody>
+              <DrawerFooter className="flex flex-row-reverse ">
+                <div className="flex flex-row items-start py-0 my-[-10px] w-full rounded">
                   {theme === "light" ? (
                     <Button
                       className="bg-transparent rounded-none px-0 text-left flex items-left justify-start w-full py-0"
@@ -221,8 +275,7 @@ export default function DefaultLayout({
                     </Button>
                   )}
                 </div>
-              </DrawerBody>
-              <DrawerFooter className="flex flex-row-reverse" />
+              </DrawerFooter>
             </>
           )}
         </DrawerContent>

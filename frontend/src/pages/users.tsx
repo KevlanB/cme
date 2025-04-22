@@ -12,13 +12,13 @@ import {
   useDisclosure,
   Input,
 } from "@heroui/react";
-import { Edit, Eye, PlusCircle, Search, Trash2 } from "lucide-react";
+import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
 import DefaultLayout from "@/layouts/default";
-import ModalNewUser from "@/components/ModalNewUser";
-import ModalEditUser from "@/components/ModalEditUser";
-import ModalDelete from "@/components/ModalDeleteUser";
+import ModalNewUser from "@/components/Modals/Create/ModalNewUser";
+import ModalEditUser from "@/components/Modals/Edit/ModalEditUser";
+import ModalDelete from "@/components/Modals/Delete/ModalDeleteUser";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -43,6 +43,11 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentDataUser, setCurrentDataUser] = useState<DataUser>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filtered = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const {
     isOpen: isOpenNewProduct,
@@ -113,7 +118,7 @@ export default function UsersPage() {
             </Tooltip>
             <Tooltip content="Excluir">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Trash2 onClick={() => handleDeleteUser(product)}/>
+                <Trash2 onClick={() => handleDeleteUser(product)} />
               </span>
             </Tooltip>
           </div>
@@ -155,6 +160,8 @@ export default function UsersPage() {
               placeholder="Buscar usuário"
               size="md"
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Button
               color="primary"
@@ -175,7 +182,7 @@ export default function UsersPage() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={products}>
+            <TableBody items={filtered}>
               {(item: any) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (

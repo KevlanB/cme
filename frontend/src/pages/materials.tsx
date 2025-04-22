@@ -15,8 +15,11 @@ import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
 import { formatDateTimeBR } from "@/utils/dateHours";
+import { formatDate } from "@/utils/date";
 import DefaultLayout from "@/layouts/default";
-import ModalNewProduct from "@/components/ModalNewMaterial";
+import ModalNewProduct from "@/components/Modals/Create/ModalNewMaterial";
+import ModalEditMaterials from "@/components/Modals/Edit/ModalEditMaterials";
+import ModalDelete from "@/components/Modals/Delete/ModalDeleteMaterial";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -28,16 +31,41 @@ export const columns = [
   { name: "AÇÕES", uid: "actions" },
 ];
 
+type DataMaterial = {
+  id: number;
+  name: string;
+  type: string;
+} | null;
+
 export default function MaterialsPage() {
   // Estado para armazenar os produtos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentDataMaterial, setCurrentDataMaterial] =
+    useState<DataMaterial>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filtered = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const {
     isOpen: isOpenNewProduct,
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenEditMaterial,
+    onOpen: onOpenEditMaterial,
+    onClose: onCloseEditMaterial,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenDeleteMaterial,
+    onOpen: onOpenDeleteMaterial,
+    onClose: onCloseDeleteMaterial,
   } = useDisclosure();
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -58,12 +86,6 @@ export default function MaterialsPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  function formatDate(dateStr: string): string {
-    const [year, month, day] = dateStr.split("-");
-
-    return `${day}/${month}/${year}`;
-  }
 
   // Função para renderizar as células
   const renderCell = (product: any, columnKey: any) => {
@@ -88,12 +110,12 @@ export default function MaterialsPage() {
           <div className="relative flex items-center gap-2 justify-center">
             <Tooltip content="Editar">
               <span className="text-lg text-default-600 cursor-pointer active:opacity-50">
-                <Edit />
+                <Edit onClick={() => handleEditMaterial(product)} />
               </span>
             </Tooltip>
             <Tooltip content="Excluir">
               <span className="text-lg text-default-600 cursor-pointer active:opacity-50">
-                <Trash2 />
+                <Trash2 onClick={() => handleDeleteMaterial(product)} />
               </span>
             </Tooltip>
           </div>
@@ -109,7 +131,19 @@ export default function MaterialsPage() {
 
   const handleCloseModal = () => {
     onCloseNewProduct();
+    onCloseEditMaterial();
+    onCloseDeleteMaterial();
     fetchProducts();
+  };
+
+  const handleEditMaterial = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenEditMaterial();
+  };
+
+  const handleDeleteMaterial = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenDeleteMaterial();
   };
 
   return (
@@ -120,9 +154,11 @@ export default function MaterialsPage() {
             <Input
               className="flex flex-row items-center justify-center w-60"
               endContent={<Search size={18} />}
-              placeholder="Buscar produto"
+              placeholder="Buscar material"
               size="md"
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Button
               color="primary"
@@ -144,7 +180,7 @@ export default function MaterialsPage() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={products}>
+            <TableBody items={filtered}>
               {(item: any) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
@@ -157,6 +193,16 @@ export default function MaterialsPage() {
         </div>
 
         <ModalNewProduct isOpen={isOpenNewProduct} onClose={handleCloseModal} />
+        <ModalEditMaterials
+          initialData={currentDataMaterial}
+          isOpen={isOpenEditMaterial}
+          onClose={handleCloseModal}
+        />
+        <ModalDelete
+          initialData={currentDataMaterial}
+          isOpen={isOpenDeleteMaterial}
+          onClose={handleCloseModal}
+        />
       </section>
     </DefaultLayout>
   );

@@ -16,7 +16,9 @@ import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
 import DefaultLayout from "@/layouts/default";
-import ModalNewFlow from "@/components/ModalNewFlows";
+import ModalNewFlow from "@/components/Modals/Create/ModalNewFlows";
+import ModalDelete from "@/components/Modals/Delete/ModalDeleteFlows";
+import ModalEdit from "@/components/Modals/Edit/ModalEditFlows";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -24,17 +26,38 @@ export const columns = [
   { name: "ETAPAS", uid: "steps" },
   { name: "AÇÕES", uid: "actions" },
 ];
+type DataMaterial = {
+  id: number;
+  name: string;
+  type: string;
+} | null;
 
 export default function FlowsPage() {
   // Estado para armazenar os produtos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentDataMaterial, setCurrentDataMaterial] =
+    useState<DataMaterial>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const filtered = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const {
     isOpen: isOpenNewProduct,
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenDeleteFlows,
+    onOpen: onOpenDeleteFlows,
+    onClose: onCloseDeleteFlows,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenEditFlows,
+    onOpen: onOpenEditFlows,
+    onClose: onCloseEditFlows,
   } = useDisclosure();
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
@@ -55,11 +78,6 @@ export default function FlowsPage() {
     fetchProducts();
   }, []);
 
-  const statusColorMap: any = {
-    true: "success",
-    false: "danger",
-  };
-
   // Função para renderizar as células
   const renderCell = (product: any, columnKey: any) => {
     const cellValue = product[columnKey];
@@ -71,7 +89,7 @@ export default function FlowsPage() {
     switch (columnKey) {
       case "steps":
         return (
-          <>
+          <div className="flex flex-row items-center gap-2">
             {cellValue.map((e) => (
               <Chip
                 key={e.id}
@@ -83,7 +101,7 @@ export default function FlowsPage() {
                 {e.name}
               </Chip>
             ))}
-          </>
+          </div>
         );
 
       case "actions":
@@ -91,12 +109,12 @@ export default function FlowsPage() {
           <div className="relative flex items-center gap-2 justify-center">
             <Tooltip content="Editar">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Edit />
+                <Edit onClick={() => handleEditFlows(product)} />
               </span>
             </Tooltip>
             <Tooltip content="Excluir">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Trash2 />
+                <Trash2 onClick={() => handleDeleteFlows(product)} />
               </span>
             </Tooltip>
           </div>
@@ -112,7 +130,19 @@ export default function FlowsPage() {
 
   const handleCloseModal = () => {
     onCloseNewProduct();
+    onCloseDeleteFlows();
+    onCloseEditFlows();
     fetchProducts();
+  };
+
+  const handleEditFlows = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenEditFlows();
+  };
+
+  const handleDeleteFlows = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenDeleteFlows();
   };
 
   return (
@@ -126,6 +156,8 @@ export default function FlowsPage() {
               placeholder="Buscar fluxo"
               size="md"
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Button
               color="primary"
@@ -147,7 +179,7 @@ export default function FlowsPage() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={products}>
+            <TableBody items={filtered}>
               {(item: any) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
@@ -160,6 +192,16 @@ export default function FlowsPage() {
         </div>
 
         <ModalNewFlow isOpen={isOpenNewProduct} onClose={handleCloseModal} />
+        <ModalDelete
+          initialData={currentDataMaterial}
+          isOpen={isOpenDeleteFlows}
+          onClose={handleCloseModal}
+        />
+        <ModalEdit
+          initialData={currentDataMaterial}
+          isOpen={isOpenEditFlows}
+          onClose={handleCloseModal}
+        />
       </section>
     </DefaultLayout>
   );

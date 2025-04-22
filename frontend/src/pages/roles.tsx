@@ -12,11 +12,13 @@ import {
   useDisclosure,
   Input,
 } from "@heroui/react";
-import { Edit, Eye, PlusCircle, Search, Trash2 } from "lucide-react";
+import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import axios from "axios";
 
 import DefaultLayout from "@/layouts/default";
-import ModalNewRoles from "@/components/ModalNewRoles";
+import ModalNewRoles from "@/components/Modals/Create/ModalNewRoles";
+import ModalEdit from "@/components/Modals/Edit/ModalEditRoles";
+import ModalDelete from "@/components/Modals/Delete/ModalDeleteRoles";
 
 export const columns = [
   { name: "ID", uid: "id" },
@@ -24,17 +26,40 @@ export const columns = [
   { name: "AÇÕES", uid: "actions" },
 ];
 
+type DataMaterial = {
+  id: number;
+  name: string;
+  type: string;
+} | null;
+
 export default function RolesPage() {
   // Estado para armazenar os produtos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentDataMaterial, setCurrentDataMaterial] =
+    useState<DataMaterial>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const filtered = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const {
     isOpen: isOpenNewProduct,
     onOpen: onOpenNewProduct,
     onClose: onCloseNewProduct,
   } = useDisclosure();
+  const {
+    isOpen: isOpenEditRoles,
+    onOpen: onOpenEditRoles,
+    onClose: onCloseEditRoles,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenDeleteRoles,
+    onOpen: onOpenDeleteRoles,
+    onClose: onCloseDeleteRoles,
+  } = useDisclosure();
+
   const API_URL = import.meta.env.VITE_API_URL;
   // Função para buscar produtos
 
@@ -90,19 +115,14 @@ export default function RolesPage() {
       case "actions":
         return (
           <div className="relative flex items-center gap-2 justify-center">
-            <Tooltip content="Detalhes">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Eye />
-              </span>
-            </Tooltip>
             <Tooltip content="Editar">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Edit />
+                <Edit onClick={() => handleEditSteps(product)} />
               </span>
             </Tooltip>
             <Tooltip content="Excluir">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Trash2 />
+                <Trash2 onClick={() => handleDeleteSteps(product)} />
               </span>
             </Tooltip>
           </div>
@@ -118,7 +138,19 @@ export default function RolesPage() {
 
   const handleCloseModal = () => {
     onCloseNewProduct();
+    onCloseEditRoles();
+    onCloseDeleteRoles();
     fetchProducts();
+  };
+
+  const handleEditSteps = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenEditRoles();
+  };
+
+  const handleDeleteSteps = (initialData: any) => {
+    setCurrentDataMaterial(initialData);
+    onOpenDeleteRoles();
   };
 
   return (
@@ -132,6 +164,8 @@ export default function RolesPage() {
               placeholder="Buscar função"
               size="md"
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Button
               color="primary"
@@ -153,7 +187,7 @@ export default function RolesPage() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={products}>
+            <TableBody items={filtered}>
               {(item: any) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
@@ -166,6 +200,16 @@ export default function RolesPage() {
         </div>
 
         <ModalNewRoles isOpen={isOpenNewProduct} onClose={handleCloseModal} />
+        <ModalEdit
+          initialData={currentDataMaterial}
+          isOpen={isOpenEditRoles}
+          onClose={handleCloseModal}
+        />
+        <ModalDelete
+          initialData={currentDataMaterial}
+          isOpen={isOpenDeleteRoles}
+          onClose={handleCloseModal}
+        />
       </section>
     </DefaultLayout>
   );

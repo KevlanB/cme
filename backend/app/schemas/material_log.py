@@ -11,9 +11,6 @@ class MaterialLogResponse(BaseModel):
     from_step: Step
     to_step: Step
     material: MaterialResponse
-
-    class Config:
-        from_attributes = True
         
 class StepCountResponse(BaseModel):
     step_id: int
@@ -23,3 +20,13 @@ class StepCountResponse(BaseModel):
 class MaterialLogsWithCountsResponse(BaseModel):
     logs: List[MaterialLogResponse]
     step_counts: List[StepCountResponse]
+    
+class MaterialFailResponse(BaseModel):
+    id: int
+    material_id: int
+    description: str
+    created_at: datetime
+    material: MaterialResponse
+    
+    class Config:
+        from_attributes = True

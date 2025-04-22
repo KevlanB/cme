@@ -16,7 +16,7 @@ import axios from "axios";
 
 import { formatDateTimeBR } from "@/utils/dateHours";
 import DefaultLayout from "@/layouts/default";
-import ModalNewProduct from "@/components/ModalNewMaterial";
+import ModalNewFail from "@/components/Modals/Create/ModalNewFail";
 
 export const columns = [
   { name: "SERIAL", uid: "serial" },
@@ -28,16 +28,30 @@ export const columns = [
   { name: "AÇÕES", uid: "actions" },
 ];
 
+type DataMaterial = {
+  id: number;
+  name: string;
+  username: string;
+  role_id: number;
+  isActive: boolean;
+} | null;
+
 export default function IndexPage() {
   // Estado para armazenar os produtos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentData, setCurrentData] = useState<DataMaterial>(null);
+
+  const filtered = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const {
-    isOpen: isOpenNewProduct,
-    onOpen: onOpenNewProduct,
-    onClose: onCloseNewProduct,
+    isOpen: isOpenNewFail,
+    onOpen: onOpenNewFail,
+    onClose: onCloseNewFail,
   } = useDisclosure();
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -115,7 +129,7 @@ export default function IndexPage() {
             <Button
               color="danger"
               startContent={<TriangleAlert size={18} />}
-              onPress={handleNewProduct}
+              onPress={() => handleNewFail(product)}
             >
               Reportar Falha
             </Button>
@@ -126,12 +140,13 @@ export default function IndexPage() {
     }
   };
 
-  const handleNewProduct = () => {
-    onOpenNewProduct();
+  const handleNewFail = (initialData: any) => {
+    setCurrentData(initialData);
+    onOpenNewFail();
   };
 
   const handleCloseModal = () => {
-    onCloseNewProduct();
+    onCloseNewFail();
     fetchProducts();
   };
 
@@ -148,17 +163,12 @@ export default function IndexPage() {
             <Input
               className="flex flex-row items-center justify-center w-60"
               endContent={<Search size={18} />}
-              placeholder="Buscar material"
+              placeholder="Buscar por nome"
               size="md"
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {/* <Button
-              color="primary"
-              startContent={<PlusCircle size={18} />}
-              onPress={handleNewProduct}
-            >
-              Novo
-            </Button> */}
           </div>
 
           <Table aria-label="Tabela de Produtos">
@@ -172,7 +182,7 @@ export default function IndexPage() {
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={products}>
+            <TableBody items={filtered}>
               {(item: any) => (
                 <TableRow key={item.id}>
                   {(columnKey) => (
@@ -184,7 +194,11 @@ export default function IndexPage() {
           </Table>
         </div>
 
-        <ModalNewProduct isOpen={isOpenNewProduct} onClose={handleCloseModal} />
+        <ModalNewFail
+          initialData={currentData}
+          isOpen={isOpenNewFail}
+          onClose={handleCloseModal}
+        />
       </section>
     </DefaultLayout>
   );

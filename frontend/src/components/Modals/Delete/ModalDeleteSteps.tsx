@@ -6,49 +6,45 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Input,
-  Select,
-  SelectItem,
   addToast,
 } from "@heroui/react";
 import axios from "axios";
-import { Eye, EyeClosed } from "lucide-react";
 
-interface ModalProps {
+interface ModalDeleteProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData: {
+    id: number;
+    name: string;
+  } | null;
 }
 
-type Role = {
-  id: string;
-  name: string;
-};
-
-const ModalDelete: React.FC<ModalProps> = ({ isOpen, onClose, initialData, }) => {
- 
-  const [fieldId, setFieldId] = useState("");
+const ModalDelete: React.FC<ModalDeleteProps> = ({
+  isOpen,
+  onClose,
+  initialData,
+}) => {
+  const [fieldId, setFieldId] = useState(0);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
   const clearFields = () => {
-    setFieldId("");
+    setFieldId(0);
   };
 
   useEffect(() => {
     if (initialData) {
-     console.log(initialData)
       setFieldId(initialData.id);
     }
   }, [initialData]);
 
   const handleSave = async () => {
-
     try {
-      await axios.delete(`${API_URL}/users/${fieldId}`);
+      await axios.delete(`${API_URL}/steps/${fieldId}`);
       onClose();
       clearFields();
       addToast({
-        title: `Usuário ${initialData.username} foi excluído!`,
+        title: `Etapa ${initialData?.name} foi excluída!`,
         color: "success",
         variant: "flat",
       });
@@ -60,10 +56,10 @@ const ModalDelete: React.FC<ModalProps> = ({ isOpen, onClose, initialData, }) =>
   return (
     <Modal backdrop="blur" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">Excluir Usuário</ModalHeader>
+        <ModalHeader className="flex flex-col gap-1">Excluir Etapa</ModalHeader>
         <ModalBody>
-          <h1>Você tem certeza que deseja excluir esse usuário?</h1>
-          </ModalBody>
+          <h1>Você tem certeza que deseja excluir esta etapa?</h1>
+        </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>
             Cancelar

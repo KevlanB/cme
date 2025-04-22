@@ -8,6 +8,7 @@ import UsersPage from "@/pages/users";
 import StepsPage from "@/pages/steps";
 import RolesPage from "@/pages/roles";
 import TraceabilityPage from "@/pages/traceability";
+import FailsPage from "@/pages/fails";
 import FlowsPage from "@/pages/flows";
 
 function App() {
@@ -70,6 +71,14 @@ function App() {
           </PrivateRoute>
         }
         path="/flows"
+      />
+      <Route
+        element={
+          <PrivateRoute>
+            <FailsPage />
+          </PrivateRoute>
+        }
+        path="/fails"
       />
     </Routes>
   );

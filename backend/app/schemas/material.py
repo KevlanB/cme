@@ -26,8 +26,8 @@ class Material(MaterialBase):
     serial: str
     created_at: datetime
     updated_at: Optional[datetime] = None
-    step: Step
-    flow: Flow
+    step: Optional[Step] = None 
+    flow: Optional[Flow] = None   
 
     class Config:
         from_attributes = True

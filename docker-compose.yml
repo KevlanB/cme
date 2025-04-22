@@ -36,5 +36,15 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./db-init:/docker-entrypoint-initdb.d
 
+  test:
+    build: ./backend
+    command: pytest --maxfail=1 --disable-warnings -v
+    environment:
+      - DATABASE_URL=postgresql://postgres:%23Kbsc11071997@db:5432/cme_db
+    depends_on:
+      - db
+    networks:
+      - default
+
 volumes:
   pgdata:
